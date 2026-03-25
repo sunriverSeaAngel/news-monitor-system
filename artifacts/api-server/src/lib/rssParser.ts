@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { db, sourcesTable, newsTable, tagsTable, newsTagsTable } from "@workspace/db";
 import { eq, inArray } from "drizzle-orm";
 import { logger } from "./logger";
+import { generateEmbedding, saveEmbedding } from "./rag";
 
 const RSS_SOURCES = [
   { name: "Lenta.ru", rssUrl: "https://lenta.ru/rss" },
@@ -191,6 +192,15 @@ async function processSource(
           tagIds.map((tagId) => ({ newsId: article.id, tagId })),
         );
       }
+    }
+
+    // Generate and save embedding for RAG
+    const embeddingText = `${title}. ${summary ?? rawText.slice(0, 500)}`;
+    const embedding = await generateEmbedding(embeddingText);
+    if (embedding) {
+      await saveEmbedding(article.id, embedding).catch((err) => {
+        logger.error({ err, newsId: article.id }, "Failed to save embedding");
+      });
     }
 
     saved++;

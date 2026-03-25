@@ -6,6 +6,7 @@ import tagsRouter from "./tags";
 import usersRouter from "./users";
 import analyticsRouter from "./analytics";
 import telegramRouter from "./telegram";
+import chatRouter from "./chat";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(tagsRouter);
 router.use(usersRouter);
 router.use(analyticsRouter);
 router.use(telegramRouter);
+router.use(chatRouter);
 
 export default router;
