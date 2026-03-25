@@ -12,7 +12,7 @@ router.get("/analytics", async (req: Request, res: Response) => {
         count: sql<number>`count(*)::int`,
       })
       .from(newsTable)
-      .where(sql`${newsTable.publishedAt} IS NOT NULL AND ${newsTable.publishedAt} >= now() - interval '30 days'`)
+      .where(sql`${newsTable.publishedAt} IS NOT NULL AND ${newsTable.publishedAt} >= now() - interval '7 days'`)
       .groupBy(sql`${newsTable.publishedAt}::date`)
       .orderBy(sql`${newsTable.publishedAt}::date`);
 
