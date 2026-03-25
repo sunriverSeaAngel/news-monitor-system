@@ -5,7 +5,8 @@
  * News Monitoring System API
  * OpenAPI spec version: 0.1.0
  */
+import type { Tag } from "./tag";
 
-export interface HealthStatus {
-  status: string;
+export interface TagsListResponse {
+  data: Tag[];
 }
