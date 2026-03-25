@@ -30,6 +30,13 @@ async function getUserByChatId(chatId: string) {
   return rows[0] ?? null;
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 export async function buildDigest(userId: string): Promise<string> {
   const subscriptions = await db
     .select({ tagId: userTagSubscriptionsTable.tagId })
@@ -96,22 +103,18 @@ export async function buildDigest(userId: string): Promise<string> {
     tagMap.get(row.newsId)!.push(row.tagName);
   }
 
-  const lines: string[] = ["📰 *Дайджест новостей*\n"];
+  const lines: string[] = ["📰 <b>Дайджест новостей</b>\n"];
   for (const a of articles) {
     const tags = tagMap.get(a.id)?.join(", ") ?? "";
-    lines.push(`*${escapeMarkdown(a.title)}*`);
-    if (a.sourceName) lines.push(`📡 ${escapeMarkdown(a.sourceName)}`);
-    if (tags) lines.push(`🏷 ${escapeMarkdown(tags)}`);
-    if (a.summary) lines.push(`_${escapeMarkdown(a.summary)}_`);
-    lines.push(`🔗 ${a.url}`);
+    lines.push(`<b>${escapeHtml(a.title)}</b>`);
+    if (a.sourceName) lines.push(`📡 ${escapeHtml(a.sourceName)}`);
+    if (tags) lines.push(`🏷 ${escapeHtml(tags)}`);
+    if (a.summary) lines.push(`<i>${escapeHtml(a.summary)}</i>`);
+    lines.push(`🔗 <a href="${escapeHtml(a.url)}">Читать далее</a>`);
     lines.push("");
   }
 
   return lines.join("\n");
-}
-
-function escapeMarkdown(text: string): string {
-  return text.replace(/[_*[\]()~`>#+=|{}.!\\-]/g, "\\$&");
 }
 
 export async function sendDigestToAll(): Promise<void> {
@@ -129,7 +132,7 @@ export async function sendDigestToAll(): Promise<void> {
     if (!user.telegramChatId) continue;
     try {
       const text = await buildDigest(user.id);
-      await bot.sendMessage(user.telegramChatId, text, { parse_mode: "MarkdownV2" });
+      await bot.sendMessage(user.telegramChatId, text, { parse_mode: "HTML" });
     } catch (err) {
       logger.error({ err, userId: user.id }, "Failed to send digest");
     }
@@ -183,8 +186,8 @@ export function startTelegramBot(): void {
       const tagList = tags.map((t) => `• ${t.name}`).join("\n");
       await bot.sendMessage(
         chatId,
-        `🏷 *Доступные теги:*\n\n${tagList}`,
-        { parse_mode: "Markdown" },
+        `🏷 <b>Доступные теги:</b>\n\n${tagList}`,
+        { parse_mode: "HTML" },
       );
     } catch (err) {
       logger.error({ err, chatId }, "Error in /tags handler");
@@ -207,7 +210,7 @@ export function startTelegramBot(): void {
 
       await bot.sendMessage(chatId, "⏳ Формирую дайджест...");
       const text = await buildDigest(user.id);
-      await bot.sendMessage(chatId, text, { parse_mode: "MarkdownV2" });
+      await bot.sendMessage(chatId, text, { parse_mode: "HTML" });
     } catch (err) {
       logger.error({ err, chatId }, "Error in /digest handler");
       await bot.sendMessage(chatId, "❌ Не удалось получить дайджест. Попробуйте позже.").catch(() => {});
