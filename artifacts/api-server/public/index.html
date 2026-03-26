@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>News Monitor API</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 48px 24px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #22c55e20;
+      color: #22c55e;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 99px;
+      border: 1px solid #22c55e40;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #f8fafc;
+      line-height: 1.2;
+    }
+
+    h1 span {
+      color: #6366f1;
+    }
+
+    .subtitle {
+      margin-top: 12px;
+      color: #94a3b8;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .endpoint {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #1e2230;
+      border: 1px solid #2d3748;
+      margin-bottom: 8px;
+      transition: border-color 0.15s;
+    }
+
+    .endpoint:hover {
+      border-color: #4f5d87;
+    }
+
+    .method {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 5px;
+      min-width: 44px;
+      text-align: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .method.get  { background: #0d3349; color: #38bdf8; }
+    .method.post { background: #1a2e1a; color: #4ade80; }
+
+    .endpoint-info { flex: 1; }
+
+    .path {
+      font-family: "SF Mono", "Fira Code", monospace;
+      font-size: 14px;
+      color: #f1f5f9;
+      font-weight: 500;
+    }
+
+    .desc {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: #334155;
+      color: #94a3b8;
+    }
+
+    .health-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    footer {
+      margin-top: 60px;
+      padding-top: 24px;
+      border-top: 1px solid #1e293b;
+      color: #475569;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    a { color: #6366f1; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="badge"><span class="health-dot"></span>API Online</div>
+      <h1>News Monitor <span>API</span></h1>
+      <p class="subtitle">
+        Сервис мониторинга новостей с RSS-парсером, RAG-ассистентом,
+        распознаванием речи и Telegram-ботом.
+      </p>
+    </header>
+
+    <div class="section">
+      <div class="section-title">Новости</div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <div class="endpoint-info">
+          <div class="path">/api/news</div>
+          <div class="desc">Список новостей с пагинацией и фильтрацией по тегу и источнику.</div>
+          <div class="tag-list">
+            <span class="tag">?page=1</span>
+            <span class="tag">?limit=20</span>
+            <span class="tag">?tag=политика</span>
+            <span class="tag">?sourceId=1</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <div class="endpoint-info">
+          <div class="path">/api/tags</div>
+          <div class="desc">Все доступные теги: политика, экономика, технологии, спорт, общество.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">AI-ассистент</div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <div class="endpoint-info">
+          <div class="path">/api/chat</div>
+          <div class="desc">
+            RAG-ассистент: находит 5 похожих новостей по косинусному расстоянию (pgvector)
+            и отвечает на вопрос через GPT-4o-mini.
+          </div>
+          <div class="tag-list">
+            <span class="tag">{ question: string }</span>
+            <span class="tag">→ { answer, sources }</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <div class="endpoint-info">
+          <div class="path">/api/speech-to-text</div>
+          <div class="desc">
+            Транскрипция аудио через OpenAI Whisper-1.
+            Принимает файл <code style="color:#94a3b8">multipart/form-data</code> в поле <code style="color:#94a3b8">audio</code>.
+          </div>
+          <div class="tag-list">
+            <span class="tag">mp3 / wav / webm / ogg / flac</span>
+            <span class="tag">→ { text: string }</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Пользователи и аналитика</div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <div class="endpoint-info">
+          <div class="path">/api/users</div>
+          <div class="desc">Регистрация пользователя. Принимает <code style="color:#94a3b8">{ id, firstName, lastName, email }</code>.</div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <div class="endpoint-info">
+          <div class="path">/api/analytics</div>
+          <div class="desc">
+            Аналитика за последние 7 дней: количество новостей по дням,
+            топ-5 тегов, воронка событий пользователей.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Сервисные эндпоинты</div>
+
+      <div class="endpoint">
+        <span class="method post">POST</span>
+        <div class="endpoint-info">
+          <div class="path">/api/telegram/set-chat-id</div>
+          <div class="desc">Привязывает Telegram chat_id к пользователю.</div>
+          <div class="tag-list"><span class="tag">{ userId, chatId }</span></div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <div class="endpoint-info">
+          <div class="path">/api/auth/profile</div>
+          <div class="desc">Профиль авторизованного пользователя (Replit Auth).</div>
+        </div>
+      </div>
+
+      <div class="endpoint">
+        <span class="method get">GET</span>
+        <div class="endpoint-info">
+          <div class="path">/api/healthz</div>
+          <div class="desc">Health-check эндпоинт. Возвращает <code style="color:#94a3b8">{ status: "ok" }</code>.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <span>News Monitor API &mdash; Express + PostgreSQL + OpenAI</span>
+      <a href="/api/healthz">healthz ↗</a>
+    </footer>
+  </div>
+</body>
+</html>
