@@ -217,6 +217,10 @@ export function startTelegramBot(): void {
     }
   });
 
+  const webhookUrl = 'https://news-monitor-system.onrender.com/telegram/webhook';
+  await bot.setWebHook(webhookUrl, { drop_pending_updates: true });
+  logger.info(`Telegram webhook set to ${webhookUrl}`);
+  
   bot.on("polling_error", (err) => {
     logger.error({ err }, "Telegram polling error");
   });
