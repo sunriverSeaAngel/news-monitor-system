@@ -3,13 +3,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import pinoHttp from "pino-http";
 import path from "path";
-import { fileURLToPath } from "url";
 import router from "./routes";
 import { logger } from "./lib/logger";
 import { authMiddleware } from "./middlewares/authMiddleware";
 
 const app: Express = express();
 
+app.use(cors());
 app.use(
   pinoHttp({
     logger,
@@ -29,21 +29,19 @@ app.use(
     },
   }),
 );
-app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(authMiddleware);
 
-// Serve static files from the public directory.
-// import.meta.url resolves correctly regardless of cwd.
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const publicDir = path.join(__dirname, "../public");
-app.use(express.static(publicDir));
+// Serve static files from public/ directory (relative to process.cwd()).
+// Dev: cwd = artifacts/api-server  → artifacts/api-server/public/
+// Prod: cwd = project root         → public/ at project root
+app.use(express.static("public"));
 
 // Serve index.html at root and at /api root (Replit proxy prefixes /api in dev).
 app.get(["/", "/api", "/api/"], (_req, res) => {
-  res.sendFile(path.join(publicDir, "index.html"));
+  res.sendFile(path.resolve("public", "index.html"));
 });
 
 app.use("/api", router);
